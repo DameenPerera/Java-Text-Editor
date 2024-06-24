@@ -1,8 +1,31 @@
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
-public class Main{
+class Functions{
+	
+	Main mainClass;
+	
+	Functions(Main mainC){
+		this.mainClass = mainC;
+	}
+	
+	public void newFile(){
+		mainClass.textArea.setText("");
+		mainClass.window.setTitle("Text Editor");
+	}
+	
+	public void openFile(){
+		FileDialog fd = new FileDialog(mainClass.window, "Select a File to Open", FileDialog.LOAD);
+		fd.setVisible(true);
+	}
+	
+}
+
+public class Main implements ActionListener{
 	JFrame window;
-	JTextArea textarea;
+	JTextArea textArea;
 	JScrollPane scrollPane;
 	JMenuBar menubar;
 	JMenu menuFile, menuEdit, menuFormat, menuColor;
@@ -27,8 +50,8 @@ public class Main{
 	}
 	
 	public void createTextArea(){
-		textarea = new JTextArea("");
-		scrollPane = new JScrollPane(textarea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		textArea = new JTextArea("");
+		scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setBorder(BorderFactory.createEmptyBorder());
 		window.add(scrollPane);
 	}
@@ -53,9 +76,13 @@ public class Main{
 	public void createFileMenu(){
 		itemNew = new JMenuItem("New");
 		menuFile.add(itemNew);
+		itemNew.addActionListener(this);
+		itemNew.setActionCommand("New");
 		
 		itemOpen = new JMenuItem("Open File");
 		menuFile.add(itemOpen);
+		itemOpen.addActionListener(this);
+		itemOpen.setActionCommand("Open");
 		
 		itemSave = new JMenuItem("Save");
 		menuFile.add(itemSave);
@@ -65,5 +92,14 @@ public class Main{
 		
 		itemExit = new JMenuItem("Exit");
 		menuFile.add(itemExit);
+	}
+	
+	Functions function = new Functions(this);
+	
+	public void actionPerformed(ActionEvent e){
+		switch (e.getActionCommand()){
+			case "New" : function.newFile(); break;
+			case "Open" : function.openFile(); break;
+		}
 	}
 }
