@@ -2,10 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 class Functions{
 	
 	Main mainClass;
+	String fileName, fileLoc;
 	
 	Functions(Main mainC){
 		this.mainClass = mainC;
@@ -19,6 +22,24 @@ class Functions{
 	public void openFile(){
 		FileDialog fd = new FileDialog(mainClass.window, "Select a File to Open", FileDialog.LOAD);
 		fd.setVisible(true);
+		if (fd.getFile() != null){
+			fileName = fd.getFile();
+			fileLoc = fd.getDirectory();
+		}
+		else
+			return;
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(fileLoc + fileName));
+			newFile();
+			mainClass.window.setTitle(fileName);
+			String line = null;
+			while ((line = br.readLine()) != null){
+				mainClass.textArea.append(line + "\n");
+			}
+			br.close();
+		}catch (Exception e){
+			JOptionPane.showMessageDialog(mainClass.textArea, e);
+		}
 	}
 	
 }
