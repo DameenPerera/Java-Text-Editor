@@ -4,6 +4,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
+import javax.swing.border.EmptyBorder;
 
 class Functions{
 	
@@ -15,6 +17,12 @@ class Functions{
 	}
 	
 	public void newFile(){
+		clearTextArea();
+		fileName = null;
+		fileLoc = null;
+	}
+	
+	public void clearTextArea(){
 		mainClass.textArea.setText("");
 		mainClass.window.setTitle("Text Editor");
 	}
@@ -26,11 +34,11 @@ class Functions{
 			fileName = fd.getFile();
 			fileLoc = fd.getDirectory();
 		}
-		else
-			return;
+		else return;
+
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(fileLoc + fileName));
-			newFile();
+			clearTextArea();
 			mainClass.window.setTitle(fileName);
 			String line = null;
 			while ((line = br.readLine()) != null){
@@ -42,6 +50,43 @@ class Functions{
 		}
 	}
 	
+	public void saveFile(){
+		if (fileName==null) saveAsFile();
+		else{
+			try{
+				FileWriter fw = new FileWriter(fileLoc + fileName);
+				fw.write(mainClass.textArea.getText());
+				fw.close();
+				mainClass.window.setTitle(fileName);
+			}catch (Exception e){
+				JOptionPane.showMessageDialog(mainClass.textArea, e);
+			}
+		}
+	}
+	
+	public void saveAsFile(){
+		FileDialog fd = new FileDialog(mainClass.window, "Save File As", FileDialog.SAVE);
+		fd.setVisible(true);
+		
+		if (fd.getFile() != null){
+			fileName = fd.getFile();
+			fileLoc = fd.getDirectory();
+		}
+		else return;
+		
+		try{
+			FileWriter fw = new FileWriter(fileLoc + fileName);
+			fw.write(mainClass.textArea.getText());
+			fw.close();
+			mainClass.window.setTitle(fileName);
+		}catch (Exception e){
+			JOptionPane.showMessageDialog(mainClass.textArea, e);
+		}
+	}
+	
+	public void exit(){
+		System.exit(0);
+	}
 }
 
 public class Main implements ActionListener{
@@ -72,6 +117,7 @@ public class Main implements ActionListener{
 	
 	public void createTextArea(){
 		textArea = new JTextArea("");
+		textArea.setBorder(new EmptyBorder(3, 3, 3, 3));
 		scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setBorder(BorderFactory.createEmptyBorder());
 		window.add(scrollPane);
@@ -107,12 +153,18 @@ public class Main implements ActionListener{
 		
 		itemSave = new JMenuItem("Save");
 		menuFile.add(itemSave);
+		itemSave.addActionListener(this);
+		itemSave.setActionCommand("Save");
 		
 		itemSaveAs = new JMenuItem("Save As");
 		menuFile.add(itemSaveAs);
+		itemSaveAs.addActionListener(this);
+		itemSaveAs.setActionCommand("SaveAs");
 		
 		itemExit = new JMenuItem("Exit");
 		menuFile.add(itemExit);
+		itemExit.addActionListener(this);
+		itemExit.setActionCommand("Exit");
 	}
 	
 	Functions function = new Functions(this);
@@ -121,6 +173,9 @@ public class Main implements ActionListener{
 		switch (e.getActionCommand()){
 			case "New" : function.newFile(); break;
 			case "Open" : function.openFile(); break;
+			case "Save" : function.saveFile(); break;
+			case "SaveAs" : function.saveAsFile(); break;
+			case "Exit" : function.exit(); break;
 		}
 	}
 }
