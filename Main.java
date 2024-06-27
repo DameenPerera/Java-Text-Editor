@@ -2,100 +2,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
 import javax.swing.border.EmptyBorder;
-
-class Functions{
-	
-	Main mainClass;
-	String fileName, fileLoc;
-	
-	Functions(Main mainC){
-		this.mainClass = mainC;
-	}
-	
-	public void newFile(){
-		clearTextArea();
-		fileName = null;
-		fileLoc = null;
-	}
-	
-	public void clearTextArea(){
-		mainClass.textArea.setText("");
-		mainClass.window.setTitle("Text Editor");
-	}
-	
-	public void openFile(){
-		FileDialog fd = new FileDialog(mainClass.window, "Select a File to Open", FileDialog.LOAD);
-		fd.setVisible(true);
-		if (fd.getFile() != null){
-			fileName = fd.getFile();
-			fileLoc = fd.getDirectory();
-		}
-		else return;
-
-		try{
-			BufferedReader br = new BufferedReader(new FileReader(fileLoc + fileName));
-			clearTextArea();
-			mainClass.window.setTitle(fileName);
-			String line = null;
-			while ((line = br.readLine()) != null){
-				mainClass.textArea.append(line + "\n");
-			}
-			br.close();
-		}catch (Exception e){
-			JOptionPane.showMessageDialog(mainClass.textArea, e);
-		}
-	}
-	
-	public void saveFile(){
-		if (fileName==null) saveAsFile();
-		else{
-			try{
-				FileWriter fw = new FileWriter(fileLoc + fileName);
-				fw.write(mainClass.textArea.getText());
-				fw.close();
-				mainClass.window.setTitle(fileName);
-			}catch (Exception e){
-				JOptionPane.showMessageDialog(mainClass.textArea, e);
-			}
-		}
-	}
-	
-	public void saveAsFile(){
-		FileDialog fd = new FileDialog(mainClass.window, "Save File As", FileDialog.SAVE);
-		fd.setVisible(true);
-		
-		if (fd.getFile() != null){
-			fileName = fd.getFile();
-			fileLoc = fd.getDirectory();
-		}
-		else return;
-		
-		try{
-			FileWriter fw = new FileWriter(fileLoc + fileName);
-			fw.write(mainClass.textArea.getText());
-			fw.close();
-			mainClass.window.setTitle(fileName);
-		}catch (Exception e){
-			JOptionPane.showMessageDialog(mainClass.textArea, e);
-		}
-	}
-	
-	public void exit(){
-		System.exit(0);
-	}
-}
 
 public class Main implements ActionListener{
 	JFrame window;
 	JTextArea textArea;
 	JScrollPane scrollPane;
 	JMenuBar menubar;
-	JMenu menuFile, menuEdit, menuFormat, menuColor;
-	JMenuItem itemNew, itemOpen, itemSave, itemSaveAs, itemExit;
+	JMenu menuFile, menuEdit, menuFormat, menuColor, menuFont, menuFontSize;
+	JMenuItem itemNew, itemOpen, itemSave, itemSaveAs, itemExit, itemWordWrap,
+		itemFontTNR, item10, item11, item12;
 	
 	public static void main(String[] args){
 		new Main();
@@ -106,6 +22,7 @@ public class Main implements ActionListener{
 		createTextArea();
 		createMenuBar();
 		createFileMenu();
+		createFormatMenu();
 		window.setVisible(true);
 	}
 	
@@ -167,7 +84,41 @@ public class Main implements ActionListener{
 		itemExit.setActionCommand("Exit");
 	}
 	
+	public void createFormatMenu(){
+		itemWordWrap = new JMenuItem("Word Wrap : OFF");
+		menuFormat.add(itemWordWrap);
+		itemWordWrap.addActionListener(this);
+		itemWordWrap.setActionCommand("ww");
+		
+		menuFont = new JMenu("Font");
+		menuFormat.add(menuFont);
+		
+		itemFontTNR = new JMenuItem("Time New Roman");
+		menuFont.add(itemFontTNR);
+		itemFontTNR.addActionListener(this);
+		itemFontTNR.setActionCommand("TNR");
+		
+		menuFontSize = new JMenu("Font Size");
+		menuFormat.add(menuFontSize);
+		
+		item10 = new JMenuItem("10");
+		menuFontSize.add(item10);
+		item10.addActionListener(this);
+		item10.setActionCommand("10");
+		
+		item11 = new JMenuItem("11");
+		menuFontSize.add(item11);
+		item11.addActionListener(this);
+		item11.setActionCommand("11");
+		
+		item12 = new JMenuItem("12");
+		menuFontSize.add(item12);
+		item12.addActionListener(this);
+		item12.setActionCommand("12");
+	}
+	
 	Functions function = new Functions(this);
+	FormatFunctions format = new FormatFunctions(this);
 	
 	public void actionPerformed(ActionEvent e){
 		switch (e.getActionCommand()){
@@ -176,6 +127,11 @@ public class Main implements ActionListener{
 			case "Save" : function.saveFile(); break;
 			case "SaveAs" : function.saveAsFile(); break;
 			case "Exit" : function.exit(); break;
+			case "ww" : format.changeWordWrap(); break;
+			case "TNR" : format.changeFont("Times New Roman"); break;
+			case "10" : format.changeSize(10); break;
+			case "11" : format.changeSize(11); break;
+			case "12" : format.changeSize(12); break;
 		}
 	}
 }
