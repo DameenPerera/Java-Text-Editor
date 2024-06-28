@@ -54,7 +54,7 @@ public class Main implements ActionListener{
 		menuFormat = new JMenu("Format");
 		menubar.add(menuFormat);
 		
-		menuColor = new JMenu("Color");
+		menuColor = new JMenu("Theme");
 		menubar.add(menuColor);
 	}
 	
