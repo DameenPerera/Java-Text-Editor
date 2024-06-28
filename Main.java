@@ -11,7 +11,7 @@ public class Main implements ActionListener{
 	JMenuBar menubar;
 	JMenu menuFile, menuEdit, menuFormat, menuColor, menuFont, menuFontSize;
 	JMenuItem itemNew, itemOpen, itemSave, itemSaveAs, itemExit, itemWordWrap,
-		itemFontTNR, item10, item11, item12;
+		itemFontTNR, item10, item11, item12, color1, color2;
 	
 	public static void main(String[] args){
 		new Main();
@@ -23,6 +23,7 @@ public class Main implements ActionListener{
 		createMenuBar();
 		createFileMenu();
 		createFormatMenu();
+		createColorMenu();
 		window.setVisible(true);
 	}
 	
@@ -117,8 +118,21 @@ public class Main implements ActionListener{
 		item12.setActionCommand("12");
 	}
 	
+	public void createColorMenu(){
+		color1 = new JMenuItem("Dark");
+		menuColor.add(color1);
+		color1.addActionListener(this);
+		color1.setActionCommand("Dark");
+		
+		color2 = new JMenuItem("Light");
+		menuColor.add(color2);
+		color2.addActionListener(this);
+		color2.setActionCommand("Light");
+	}
+	
 	Functions function = new Functions(this);
 	FormatFunctions format = new FormatFunctions(this);
+	Theme theme = new Theme(this);
 	
 	public void actionPerformed(ActionEvent e){
 		switch (e.getActionCommand()){
@@ -132,6 +146,8 @@ public class Main implements ActionListener{
 			case "10" : format.changeSize(10); break;
 			case "11" : format.changeSize(11); break;
 			case "12" : format.changeSize(12); break;
+			case "Dark" : theme.dark(); break;
+			case "Light" : theme.light(); break;
 		}
 	}
 }
