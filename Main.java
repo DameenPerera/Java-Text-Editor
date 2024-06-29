@@ -13,7 +13,9 @@ public class Main implements ActionListener{
 	JMenu menuFile, menuEdit, menuFormat, menuColor, menuFont, menuFontSize;
 	JMenuItem itemNew, itemOpen, itemSave, itemSaveAs, itemExit, itemWordWrap,
 		itemFontTNR, item10, item11, item12, color1, color2, itemUndo, itemRedo;
-		
+	
+	KeyHandler kh = new KeyHandler(this);
+	
 	UndoManager undoManager = new UndoManager();
 	
 	public static void main(String[] args){
@@ -26,7 +28,6 @@ public class Main implements ActionListener{
 		createFileMenu();
 		createFormatMenu();
 		createColorMenu();
-		createEditMenu();
 		window.setVisible(true);
 	}
 	
@@ -39,6 +40,8 @@ public class Main implements ActionListener{
 	public void createTextAreaAndMenu(){
 		textArea = new JTextArea("");
 		textArea.getDocument().addUndoableEditListener(e -> undoManager.addEdit(e.getEdit()));
+		
+		textArea.addKeyListener(kh);
         
         // Create undo action
         Action undoAction = new AbstractAction("Undo") {
@@ -167,14 +170,9 @@ public class Main implements ActionListener{
 		color2.setActionCommand("Light");
 	}
 	
-	public void createEditMenu(){
-		
-	}
-	
 	Functions function = new Functions(this);
 	FormatFunctions format = new FormatFunctions(this);
 	Theme theme = new Theme(this);
-	EditFunctions edit = new EditFunctions(this);
 	
 	public void actionPerformed(ActionEvent e){
 		switch (e.getActionCommand()){
