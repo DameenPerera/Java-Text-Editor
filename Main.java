@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.border.EmptyBorder;
+import javax.swing.undo.*;
 
 public class Main implements ActionListener{
 	JFrame window;
@@ -11,7 +12,9 @@ public class Main implements ActionListener{
 	JMenuBar menubar;
 	JMenu menuFile, menuEdit, menuFormat, menuColor, menuFont, menuFontSize;
 	JMenuItem itemNew, itemOpen, itemSave, itemSaveAs, itemExit, itemWordWrap,
-		itemFontTNR, item10, item11, item12, color1, color2;
+		itemFontTNR, item10, item11, item12, color1, color2, itemUndo, itemRedo;
+		
+	UndoManager undoManager = new UndoManager();
 	
 	public static void main(String[] args){
 		new Main();
@@ -19,11 +22,11 @@ public class Main implements ActionListener{
 	
 	public Main(){
 		createWindow();
-		createTextArea();
-		createMenuBar();
+		createTextAreaAndMenu();
 		createFileMenu();
 		createFormatMenu();
 		createColorMenu();
+		createEditMenu();
 		window.setVisible(true);
 	}
 	
@@ -33,15 +36,35 @@ public class Main implements ActionListener{
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
-	public void createTextArea(){
+	public void createTextAreaAndMenu(){
 		textArea = new JTextArea("");
+		textArea.getDocument().addUndoableEditListener(e -> undoManager.addEdit(e.getEdit()));
+        
+        // Create undo action
+        Action undoAction = new AbstractAction("Undo") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (undoManager.canUndo()) {
+                    undoManager.undo();
+                }
+            }
+        };
+        
+        // Create redo action
+        Action redoAction = new AbstractAction("Redo") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (undoManager.canRedo()) {
+                    undoManager.redo();
+                }
+            }
+        };
+        
 		textArea.setBorder(new EmptyBorder(3, 3, 3, 3));
 		scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setBorder(BorderFactory.createEmptyBorder());
 		window.add(scrollPane);
-	}
-	
-	public void createMenuBar(){
+		
 		menubar = new JMenuBar();
 		window.setJMenuBar(menubar);
 		
@@ -54,8 +77,22 @@ public class Main implements ActionListener{
 		menuFormat = new JMenu("Format");
 		menubar.add(menuFormat);
 		
-		menuColor = new JMenu("Theme");
+		menuColor = new JMenu("Color");
 		menubar.add(menuColor);
+		
+		itemUndo = new JMenuItem(undoAction);
+		menuEdit.add(itemUndo);
+		
+		itemRedo = new JMenuItem(redoAction);
+		menuEdit.add(itemRedo);
+		
+		// Bind undo action to Ctrl+Z
+        textArea.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Z"), "Undo");
+        textArea.getActionMap().put("Undo", undoAction);
+        
+        // Bind redo action to Ctrl+Y
+        textArea.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Y"), "Redo");
+        textArea.getActionMap().put("Redo", redoAction);
 	}
 	
 	public void createFileMenu(){
@@ -130,9 +167,14 @@ public class Main implements ActionListener{
 		color2.setActionCommand("Light");
 	}
 	
+	public void createEditMenu(){
+		
+	}
+	
 	Functions function = new Functions(this);
 	FormatFunctions format = new FormatFunctions(this);
 	Theme theme = new Theme(this);
+	EditFunctions edit = new EditFunctions(this);
 	
 	public void actionPerformed(ActionEvent e){
 		switch (e.getActionCommand()){
